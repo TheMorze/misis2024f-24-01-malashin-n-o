@@ -1,6 +1,10 @@
-CMake Warning:
-  Manually-specified variables were not used by the project:
-
-    BUILD_TO_CHECK_STUDENT
+CMake Error at D:/programs/vcpkg/scripts/buildsystems/vcpkg.cmake:637 (_add_library):
+  _add_library cannot create target "complex" because another target with the
+  same name already exists.  The existing target is a static library created
+  in source directory
+  "D:/projects/2024-misis-fall/misis2024f-24-01-malashin-n-o/prj.lab/complex".
+  See documentation for policy CMP0002 for more details.
+Call Stack (most recent call first):
+  prj.lab/rational/CMakeLists.txt:1 (add_library)
 
 
