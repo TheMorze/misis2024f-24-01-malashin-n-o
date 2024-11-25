@@ -1,4 +1,4 @@
-STAMP: 20241123-221649
+STAMP: 20241125-100215
 OK: file codeforces.id is correct
 ERROR: file prj.lab/complex/complex.cpp is absent
 ERROR: file prj.lab/rational/rational.cpp is absent
