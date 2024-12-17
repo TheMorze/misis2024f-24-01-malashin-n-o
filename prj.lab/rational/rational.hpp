@@ -1,147 +1,83 @@
-#ifndef RATIONAL
-#define RATIONAL
+// 2024 by Polevoi Dmitry under Unlicense
 
-#include <iostream>
+#pragma once
+#ifndef RATIONAL_HPP
+#define RATIONAL_HPP
 
-struct Rational {
-    int numerator;
-    int denominator;
+#include <cstdint>
+#include <iosfwd>
 
-    // Конструктор
-    Rational(int num = 0, int denom = 1) : numerator(num), denominator(denom) {
-        if (denominator == 0) {
-            std::cerr << "Ошибка: знаменатель не может быть нулевым\n";
-            numerator = 0;
-            denominator = 1;
-        } else {
-            reduce();
-        }
-    }
+class Rational {
+public:
+    Rational() = default;
+    Rational(const Rational&) = default;
+    //Rational(Rational&&) = default;
 
-    // Функция для вычисления наибольшего общего делителя (НОД)
-    int gcd(int a, int b) const {
-        a = (a < 0) ? -a : a; // Модуль числа a
-        b = (b < 0) ? -b : b; // Модуль числа b
-        while (b != 0) {
-            int temp = b;
-            b = a % b;
-            a = temp;
-        }
-        return a;
-    }
+    // Конструктор из целого числа: num/1
+    explicit Rational(std::int32_t num) noexcept : num_(num) { }
 
-    // Функция сокращения дроби
-    void reduce() {
-        int divisor = gcd(numerator, denominator);
-        numerator /= divisor;
-        denominator /= divisor;
-        // Обеспечиваем положительный знаменатель
-        if (denominator < 0) {
-            numerator = -numerator;
-            denominator = -denominator;
-        }
-    }
+    // Конструктор из числителя и знаменателя
+    // Бросает исключение при нуле в знаменателе
+    Rational(std::int32_t num, std::int32_t den);
 
-    // Оператор сложения
-    Rational operator+(const Rational& rhs) const {
-        int num = numerator * rhs.denominator + rhs.numerator * denominator;
-        int denom = denominator * rhs.denominator;
-        return Rational(num, denom);
-    }
+    ~Rational() = default;
 
-    Rational& operator+=(const Rational& rhs) {
-        numerator = numerator * rhs.denominator + rhs.numerator * denominator;
-        denominator *= rhs.denominator;
-        reduce();
-        return *this;
-    }
+    Rational& operator=(const Rational&) = default;
+    //Rational& operator=(Rational&&) = default;
 
-    // Оператор вычитания
-    Rational operator-(const Rational& rhs) const {
-        int num = numerator * rhs.denominator - rhs.numerator * denominator;
-        int denom = denominator * rhs.denominator;
-        return Rational(num, denom);
-    }
+    [[nodiscard]] std::int32_t num() const noexcept { return num_; }
+    [[nodiscard]] std::int32_t den() const noexcept { return den_; }
 
-    Rational& operator-=(const Rational& rhs) {
-        numerator = numerator * rhs.denominator - rhs.numerator * denominator;
-        denominator *= rhs.denominator;
-        reduce();
-        return *this;
-    }
+    [[nodiscard]] bool operator==(const Rational& rhs) const noexcept;
+    [[nodiscard]] bool operator!=(const Rational& rhs) const noexcept;
+    [[nodiscard]] bool operator<(const Rational& rhs) const noexcept;
+    [[nodiscard]] bool operator<=(const Rational& rhs) const noexcept;
+    [[nodiscard]] bool operator>(const Rational& rhs) const noexcept;
+    [[nodiscard]] bool operator>=(const Rational& rhs) const noexcept;
 
-    // Оператор умножения
-    Rational operator*(const Rational& rhs) const {
-        int num = numerator * rhs.numerator;
-        int denom = denominator * rhs.denominator;
-        return Rational(num, denom);
-    }
+    [[nodiscard]] Rational operator-() const noexcept { return { -num_, den_ }; }
 
-    Rational& operator*=(const Rational& rhs) {
-        numerator *= rhs.numerator;
-        denominator *= rhs.denominator;
-        reduce();
-        return *this;
-    }
+    Rational& operator+=(const Rational& rhs) noexcept;
+    Rational& operator-=(const Rational& rhs) noexcept;
+    Rational& operator*=(const Rational& rhs) noexcept;
+    Rational& operator/=(const Rational& rhs);
 
-    // Оператор деления
-    Rational operator/(const Rational& rhs) const {
-        if (rhs.numerator == 0) {
-            std::cerr << "Ошибка: деление на ноль\n";
-            return Rational(0, 1);
-        }
-        int num = numerator * rhs.denominator;
-        int denom = denominator * rhs.numerator;
-        return Rational(num, denom);
-    }
+    Rational& operator+=(std::int32_t rhs) noexcept;
+    Rational& operator-=(std::int32_t rhs) noexcept;
+    Rational& operator*=(std::int32_t rhs) noexcept;
+    Rational& operator/=(std::int32_t rhs);
 
-    Rational& operator/=(const Rational& rhs) {
-        if (rhs.numerator == 0) {
-            std::cerr << "Ошибка: деление на ноль\n";
-            numerator = 0;
-            denominator = 1;
-        } else {
-            numerator *= rhs.denominator;
-            denominator *= rhs.numerator;
-            reduce();
-        }
-        return *this;
-    }
+    // Форматированный вывод в поток ostrm: num/den
+    std::ostream& WriteTo(std::ostream& ostrm) const noexcept;
 
-    // Операторы сравнения
-    bool operator==(const Rational& rhs) const {
-        return numerator == rhs.numerator && denominator == rhs.denominator;
-    }
+    // Форматированный ввод из потока istrm: num/den
+    std::istream& ReadFrom(std::istream& istrm) noexcept;
 
-    bool operator!=(const Rational& rhs) const {
-        return !(*this == rhs);
-    }
+private:
+    std::int32_t num_ = 0; //!< числитель
+    std::int32_t den_ = 1; //!< знаменатель, всегда > 0 после Normalize()
 
-    // Операторы ввода/вывода
-    friend std::ostream& operator<<(std::ostream& os, const Rational& r);
-    friend std::istream& operator>>(std::istream& is, Rational& r);
+    // Нормализация дроби: знак в числителе, сокращение к несократимой форме
+    void Normalize() noexcept;
 };
 
-// Оператор вывода
-std::ostream& operator<<(std::ostream& os, const Rational& r) {
-    os << r.numerator;
-    if (r.denominator != 1) {
-        os << '/' << r.denominator;
-    }
-    return os;
-}
+[[nodiscard]] Rational operator+(const Rational& lhs, const Rational& rhs) noexcept;
+[[nodiscard]] Rational operator-(const Rational& lhs, const Rational& rhs) noexcept;
+[[nodiscard]] Rational operator*(const Rational& lhs, const Rational& rhs) noexcept;
+[[nodiscard]] Rational operator/(const Rational& lhs, const Rational& rhs);
 
-// Оператор ввода
-std::istream& operator>>(std::istream& is, Rational& r) {
-    int num, denom = 1;
-    char ch;
-    is >> num;
-    if (is.peek() == '/') {
-        is >> ch >> denom;
-    }
-    r = Rational(num, denom);
-    return is;
-}
+[[nodiscard]] Rational operator+(const Rational& lhs, std::int32_t rhs) noexcept;
+[[nodiscard]] Rational operator-(const Rational& lhs, std::int32_t rhs) noexcept;
+[[nodiscard]] Rational operator*(const Rational& lhs, std::int32_t rhs) noexcept;
+[[nodiscard]] Rational operator/(const Rational& lhs, std::int32_t rhs);
+
+[[nodiscard]] Rational operator+(std::int32_t lhs, const Rational& rhs) noexcept;
+[[nodiscard]] Rational operator-(std::int32_t lhs, const Rational& rhs) noexcept;
+[[nodiscard]] Rational operator*(std::int32_t lhs, const Rational& rhs) noexcept;
+[[nodiscard]] Rational operator/(std::int32_t lhs, const Rational& rhs);
+
+std::ostream& operator<<(std::ostream& ostrm, const Rational& rhs) noexcept;
+
+std::istream& operator>>(std::istream& istrm, Rational& rhs) noexcept;
 
 #endif
-

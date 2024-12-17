@@ -31,5 +31,13 @@
 *.out
 *.app
 
-
+# Studio Code
+.vs
 .vscode
+out
+
+# Build Artifacts
+build
+build.*
+bin
+bin.*

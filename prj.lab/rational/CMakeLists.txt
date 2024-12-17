@@ -1,1 +1,1 @@
-add_library(complex rational.cpp rational.hpp)
+add_library(rational rational.cpp rational.hpp)

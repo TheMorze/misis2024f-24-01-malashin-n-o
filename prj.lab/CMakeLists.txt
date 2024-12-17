@@ -1,2 +1,6 @@
+add_subdirectory(arrayd)
+add_subdirectory(arrayt)
 add_subdirectory(complex)
+add_subdirectory(queuea)
 add_subdirectory(rational)
+add_subdirectory(stackl)
